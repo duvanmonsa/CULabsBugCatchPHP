@@ -160,7 +160,7 @@ class ErrorHandler
      */
     public function setFiles($files)
     {
-        $this->files = $files;
+        $this->filesPost = $files;
     }
 
     /**

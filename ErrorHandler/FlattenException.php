@@ -31,16 +31,13 @@ class FlattenException
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
-
         if ($exception instanceof HttpExceptionInterface) { //TODO: Despues quitar la dependencia a esta excepcion de symfony
             $statusCode = $exception->getStatusCode();
             $headers = array_merge($headers, $exception->getHeaders());
         }
-
         if (null === $statusCode) {
             $statusCode = 500;
         }
-
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromException($exception);
