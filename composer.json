@@ -1,0 +1,24 @@
+{
+    "name": "culabs/bugcatch",
+    "type": "library",
+    "description": "Integrate BugCatch in PHP applications",
+    "keywords": ["Bug", "BugCatch"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Renier Ricardo Figueredo",
+            "email": "aprezcuba24@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "CULabs\\BugCatch": ""
+        }
+    },
+    "target-dir": "CULabs/BugCatch"
+}

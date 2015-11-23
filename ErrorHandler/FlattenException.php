@@ -6,6 +6,8 @@
  */
 namespace CULabs\BugCatch\ErrorHandler;
 
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 /**
  * Class FlattenException
  * @package CULabs\BugCatchBundle\ErrorHandler
@@ -30,7 +32,7 @@ class FlattenException
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
 
-        if ($exception instanceof HttpExceptionInterface) {
+        if ($exception instanceof HttpExceptionInterface) { //TODO: Despues quitar la dependencia a esta excepcion de symfony
             $statusCode = $exception->getStatusCode();
             $headers = array_merge($headers, $exception->getHeaders());
         }
