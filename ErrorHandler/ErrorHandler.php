@@ -17,30 +17,32 @@ class ErrorHandler
     protected $filesPost;
     protected $server;
     protected $userData = [];
+    protected $activate;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, $activate = true)
     {
-        $this->client = $client;
+        $this->client   = $client;
+        $this->activate = $activate;
     }
 
     public function notifyException(\Exception $exception)
     {
         $this->createFromGlobals();
         $exception = FlattenException::create($exception);
-        $this->client->request('POST', 'errors.json', [
-            'form_params' => [
-                'method'    => isset($this->server['REQUEST_METHOD'])? $this->server['REQUEST_METHOD']: '',
-                'host'      => isset($this->server['HTTP_HOST'])? $this->server['HTTP_HOST']: '',
-                'uri'       => isset($this->server['REQUEST_URI'])? $this->server['REQUEST_URI']: '',
-                'scheme'    => isset($this->server['REQUEST_SCHEME'])? $this->server['REQUEST_SCHEME']: '',
-                'userData'  => json_encode($this->userData),
-                'post'      => json_encode($this->post),
-                'get'       => json_encode($this->get),
-                'cookie'    => json_encode($this->cookie),
-                'filesPost' => json_encode($this->filesPost),
-                'server'    => json_encode($this->server),
-                'errors'    => $exception->toArray(),
-            ],
+        $this->sendRequest([
+          'form_params' => [
+            'method'    => isset($this->server['REQUEST_METHOD'])? $this->server['REQUEST_METHOD']: '',
+            'host'      => isset($this->server['HTTP_HOST'])? $this->server['HTTP_HOST']: '',
+            'uri'       => isset($this->server['REQUEST_URI'])? $this->server['REQUEST_URI']: '',
+            'scheme'    => isset($this->server['REQUEST_SCHEME'])? $this->server['REQUEST_SCHEME']: '',
+            'userData'  => json_encode($this->userData),
+            'post'      => json_encode($this->post),
+            'get'       => json_encode($this->get),
+            'cookie'    => json_encode($this->cookie),
+            'filesPost' => json_encode($this->filesPost),
+            'server'    => json_encode($this->server),
+            'errors'    => $exception->toArray(),
+          ],
         ]);
     }
 
@@ -55,13 +57,21 @@ class ErrorHandler
             }
             $uri .= ' '.$item;
         }
-        $this->client->request('POST', 'errors.json', [
-            'form_params' => [
-                'host'   => isset($this->server['argv'][0])? $this->server['argv'][0]: '',
-                'uri'    => $uri,
-                'errors' => $exception->toArray(),
-            ],
+        $this->sendRequest([
+          'form_params' => [
+            'host'   => isset($this->server['argv'][0])? $this->server['argv'][0]: '',
+            'uri'    => $uri,
+            'errors' => $exception->toArray(),
+          ],
         ]);
+    }
+
+    protected function sendRequest($data)
+    {
+        if (!$this->activate) {
+            return;
+        }
+        $this->client->request('POST', 'errors.json', $data);
     }
 
     protected function createFromGlobals()
