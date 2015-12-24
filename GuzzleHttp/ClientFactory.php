@@ -10,7 +10,7 @@ use GuzzleHttp\Client;
 
 class ClientFactory
 {
-    const BASE_URI = 'http://bugcatch.pagomio.com/app_api.php/api/';
+    const BASE_URI = 'http://bugcaches.com/app_api.php/api/';
 
     protected $appKey;
 
