@@ -71,7 +71,11 @@ class ErrorHandler
         if (!$this->activate) {
             return;
         }
-        $this->client->request('POST', 'errors.json', $data);
+        try {
+            $this->client->request('POST', 'errors.json', $data);
+        } catch (\Exception $e) {
+
+        }
     }
 
     protected function createFromGlobals()
