@@ -6,7 +6,7 @@
  */
 namespace CULabs\BugCatch\ErrorHandler;
 
-use GuzzleHttp\Client;
+use CULabs\BugCatch\Client\Client;
 
 class ErrorHandler
 {
@@ -16,7 +16,7 @@ class ErrorHandler
     protected $cookie;
     protected $filesPost;
     protected $server;
-    protected $userData = [];
+    protected $userData = array();
     protected $activate;
 
     public function __construct(Client $client, $activate = true)
@@ -29,8 +29,7 @@ class ErrorHandler
     {
         $this->createFromGlobals();
         $exception = FlattenException::create($exception);
-        $this->sendRequest([
-          'form_params' => [
+        $this->sendRequest(array(
             'method'    => isset($this->server['REQUEST_METHOD'])? $this->server['REQUEST_METHOD']: '',
             'host'      => isset($this->server['HTTP_HOST'])? $this->server['HTTP_HOST']: '',
             'uri'       => isset($this->server['REQUEST_URI'])? $this->server['REQUEST_URI']: '',
@@ -42,8 +41,7 @@ class ErrorHandler
             'filesPost' => json_encode($this->filesPost),
             'server'    => json_encode($this->server),
             'errors'    => $exception->toArray(),
-          ],
-        ]);
+        ));
     }
 
     public function notifyCommandException(\Exception $exception)
@@ -57,13 +55,11 @@ class ErrorHandler
             }
             $uri .= ' '.$item;
         }
-        $this->sendRequest([
-          'form_params' => [
+        $this->sendRequest(array(
             'host'   => isset($this->server['argv'][0])? $this->server['argv'][0]: '',
             'uri'    => $uri,
             'errors' => $exception->toArray(),
-          ],
-        ]);
+        ));
     }
 
     protected function sendRequest($data)
@@ -72,7 +68,7 @@ class ErrorHandler
             return;
         }
         try {
-            $this->client->request('POST', 'errors.json', $data);
+            $this->client->send($data);
         } catch (\Exception $e) {
 
         }
