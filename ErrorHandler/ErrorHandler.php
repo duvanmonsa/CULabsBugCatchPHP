@@ -18,6 +18,7 @@ class ErrorHandler
     protected $server;
     protected $userData = array();
     protected $activate;
+    protected $objectsProcessed = array();
 
     public function __construct(Client $client, $activate = true)
     {
@@ -70,7 +71,6 @@ class ErrorHandler
         try {
             $this->client->send($data);
         } catch (\Exception $e) {
-
         }
     }
 
@@ -187,5 +187,44 @@ class ErrorHandler
     public function setServer($server)
     {
         $this->server = $server;
+    }
+
+    public function processObject($object, $deep = 3)
+    {
+        if (!is_object($object)) {
+            return $object;
+        }
+        $this->objectsProcessed = array(spl_object_hash($object));
+
+        return $this->doProcessObject($object, $deep);
+    }
+
+    private function doProcessObject($object, $deep)
+    {
+        if (!is_object($object)) {
+            return $object;
+        }
+        $result = array();
+        $reflection = new \ReflectionObject($object);
+        foreach ($reflection->getMethods() as $method) {
+            if ($method->getNumberOfRequiredParameters()) {
+                continue;
+            }
+            try {
+                $value = $method->invoke($object);
+                if ($value instanceof \DateTime) {
+                    $value = $value->format('Y-m-d H:i:s');
+                } elseif (is_object($value) && $deep - 1 > 0 ) {
+                    if (in_array(spl_object_hash($value), $this->objectsProcessed)) {
+                        continue;
+                    }
+                    $this->objectsProcessed[] = spl_object_hash($value);
+                    $value = $this->doProcessObject($value, $deep - 1);
+                }
+                $result[$method->getName()] = $value;
+            } catch (\Exception $e) {}
+        }
+
+        return $result;
     }
 }
