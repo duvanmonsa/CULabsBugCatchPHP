@@ -26,6 +26,11 @@ class ErrorHandler
         $this->activate = $activate;
     }
 
+    public function errorHandler($errno, $errstr, $errfile, $errline)
+    {
+        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    }
+
     public function notifyException(\Exception $exception)
     {
         $this->createFromGlobals();
