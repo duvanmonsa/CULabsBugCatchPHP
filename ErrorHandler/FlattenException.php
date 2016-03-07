@@ -6,8 +6,6 @@
  */
 namespace CULabs\BugCatch\ErrorHandler;
 
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-
 /**
  * Class FlattenException
  * @package CULabs\BugCatchBundle\ErrorHandler
